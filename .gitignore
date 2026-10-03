@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Pipeline cache and temporary downloads
+.cache/
+*.tmp
+*.jar
+
+# Local generated output (GitHub Actions builds this and deploys to Pages)
+public/
+
+# Environment / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
