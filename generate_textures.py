@@ -263,29 +263,61 @@ def resolve_special_entity_textures(item_name: str, item_def: dict, assets_root:
 
 
 def infer_category(item_name: str, primary_path: str):
-    if "block" in primary_path or primary_path.startswith("textures/block/"):
-        return "block"
-    for tool_suffix in (
-        "_sword", "_pickaxe", "_axe", "_shovel", "_hoe", "bow", "crossbow", "mace", "trident", "fishing_rod"
-    ):
-        if item_name.endswith(tool_suffix) or item_name == tool_suffix:
-            return "tools"
-    for armor_suffix in (
-        "_helmet", "_chestplate", "_leggings", "_boots", "shield", "wolf_armor", "elytra"
-    ):
-        if item_name.endswith(armor_suffix) or item_name == armor_suffix:
-            return "armor"
+    # 1. Spawn Eggs
     if item_name.endswith("_spawn_egg"):
         return "spawn_eggs"
-    if any(
-        f in item_name
-        for f in (
-            "apple", "bread", "beef", "porkchop", "mutton", "chicken", "potato", "carrot", "stew", "soup",
-            "pie", "cookie", "cake", "berries", "melon_slice", "golden_apple", "potion"
-        )
+
+    # 2. Audio & Music
+    if item_name.startswith("music_disc_") or item_name.endswith("_goat_horn") or item_name == "goat_horn":
+        return "audio"
+
+    # 3. Potions & Magic
+    if "potion" in item_name or item_name.startswith("tipped_arrow") or item_name in (
+        "enchanted_book", "experience_bottle", "totem_of_undying", "ender_pearl", "eye_of_ender", "ender_eye", "ominous_bottle", "end_crystal"
     ):
+        return "potions"
+
+    # 4. Armor & Equipment
+    if any(item_name.endswith(s) for s in ("_helmet", "_chestplate", "_leggings", "_boots", "_horse_armor", "wolf_armor", "elytra", "turtle_helmet", "_nautilus_armor")):
+        return "armor"
+
+    # 5. Weapons & Combat
+    if any(item_name.endswith(s) for s in ("_sword", "bow", "crossbow", "arrow", "mace", "trident", "shield", "spectral_arrow", "wind_charge", "_spear")) or "smithing_template" in item_name or "armor_trim" in item_name:
+        return "combat"
+
+    # 6. Tools & Utilities
+    if any(item_name.endswith(s) for s in ("_pickaxe", "_axe", "_shovel", "_hoe", "fishing_rod", "flint_and_steel", "shears", "brush", "spyglass", "lead", "name_tag", "compass", "recovery_compass", "clock", "saddle", "_map", "map", "bundle", "shears", "firework_rocket", "_key", "key", "fire_charge")) or any(s in item_name for s in ("_boat", "_raft", "minecart", "_bucket", "bucket")):
+        return "tools"
+
+    # 7. Food & Drinks
+    if any(s in item_name for s in ("apple", "bread", "porkchop", "beef", "chicken", "mutton", "rabbit", "cod", "salmon", "potato", "carrot", "beetroot", "melon_slice", "berries", "pie", "cookie", "cake", "stew", "soup", "honey_bottle", "milk_bucket", "dried_kelp", "chorus_fruit", "egg", "golden_apple", "golden_carrot", "rotten_flesh", "spider_eye", "pufferfish", "tropical_fish")):
         return "food"
-    return "item"
+
+    # 8. Redstone & Mechanisms
+    if any(s in item_name for s in ("redstone", "repeater", "comparator", "piston", "observer", "dispenser", "dropper", "hopper", "crafter", "target", "daylight_detector", "lever", "_button", "_pressure_plate", "_door", "_trapdoor", "_fence_gate", "rail", "tripwire_hook", "lightning_rod", "sculk_sensor", "sculk_shrieker", "sculk_catalyst", "tripwire", "iron_chain", "chain")):
+        return "redstone"
+
+    # 9. Functional & Decorative
+    if any(s in item_name for s in ("furnace", "table", "chest", "barrel", "anvil", "enchanting_table", "beacon", "bell", "campfire", "respawn_anchor", "bookshelf", "lectern", "jukebox", "grindstone", "smithing_table", "stonecutter", "brewing_stand", "cauldron", "composter", "loom", "ender_chest", "spawner", "decorated_pot", "sign", "hanging_sign", "armor_stand", "item_frame", "glow_item_frame", "flower_pot", "cushion", "harness", "shelf", "chiseled_bookshelf", "lodestone", "lantern", "painting", "shulker_box")):
+        return "functional"
+
+    # 10. Colored Blocks
+    if any(s in item_name for s in ("_wool", "_carpet", "_stained_glass", "_concrete", "_terracotta", "_bed", "_shulker_box", "_banner", "_candle", "candle", "_dye", "dye")) or item_name in ("white_wool", "black_wool"):
+        return "colored"
+
+    # 11. Natural Blocks & Flora
+    if any(s in item_name for s in ("ore", "dirt", "grass", "sand", "gravel", "clay", "ice", "snow", "_log", "_wood", "_leaves", "_sapling", "flower", "tulip", "orchid", "rose", "daisy", "dandelion", "allium", "bluet", "poppy", "mushroom", "fungus", "roots", "vines", "lily_pad", "cactus", "sugar_cane", "bamboo", "kelp", "sponge", "coral", "sculk", "amethyst", "dripstone", "obsidian", "crying_obsidian", "netherrack", "soul_sand", "soul_soil", "end_stone", "basalt", "tuff", "calcite", "magma_block", "glowstone", "nylium", "spore_blossom", "sea_pickle", "pointed_dripstone", "weeping_vines", "twisting_vines", "wildflowers", "pale_hanging_moss", "moss", "seeds", "plant", "propagule", "petals", "sprouts", "wart", "leaf_litter", "spike", "bush")):
+        return "natural"
+
+    # 12. Ingredients & Materials
+    if any(s in item_name for s in ("_ingot", "ingot", "_nugget", "nugget", "raw_", "diamond", "emerald", "lapis_lazuli", "coal", "charcoal", "copper", "netherite_scrap", "quartz", "flint", "stick", "feather", "string", "leather", "rabbit_hide", "rabbit_foot", "scute", "slime_ball", "magma_cream", "blaze_rod", "blaze_powder", "ghast_tear", "nether_star", "shulker_shell", "nautilus_shell", "heart_of_the_sea", "prismarine_shard", "prismarine_crystals", "echo_shard", "disc_fragment", "_sherd", "sherd", "resin", "heavy_core", "breeze_rod", "bone", "bone_meal", "book", "bowl", "paper", "gunpowder", "sugar", "clay_ball", "brick", "nether_brick", "prismarine_crystals", "firework_star", "dragon_breath", "phantom_membrane", "glow_ink_sac", "ink_sac", "honeycomb", "wheat", "cocoa_beans", "pod")):
+        return "ingredients"
+
+    # 13. Building Blocks
+    if any(s in item_name for s in ("_planks", "_slab", "_stairs", "_wall", "_fence", "brick", "stone", "cobblestone", "sandstone", "diorite", "granite", "andesite", "prismarine", "purpur", "quartz_block", "copper_block", "cut_copper", "chiseled_", "polished_", "smooth_", "cracked_", "mossy_", "deepslate", "mud_brick", "blackstone", "end_stone_brick", "glass", "tinted_glass", "glass_pane")) or "block" in primary_path:
+        return "building"
+
+    return "misc"
 
 
 # ---------------------------------------------------------------------------
@@ -1309,13 +1341,20 @@ def generate_web_portal(output_dir: Path, manifest: dict, items: dict):
           <input type="text" id="searchInput" class="search-input" placeholder="Search item by name or id (e.g. diamond, sword, furnace)...">
         </div>
         <div class="filter-pills">
-          <button class="filter-pill active" onclick="setFilter('all')">All</button>
-          <button class="filter-pill" onclick="setFilter('item')">Items</button>
-          <button class="filter-pill" onclick="setFilter('block')">Blocks</button>
-          <button class="filter-pill" onclick="setFilter('tools')">Tools & Weapons</button>
-          <button class="filter-pill" onclick="setFilter('armor')">Armor</button>
-          <button class="filter-pill" onclick="setFilter('food')">Food</button>
-          <button class="filter-pill" onclick="setFilter('spawn_eggs')">Spawn Eggs</button>
+          <button class="filter-pill active" data-cat="all" onclick="setFilter('all')">All</button>
+          <button class="filter-pill" data-cat="building" onclick="setFilter('building')">Building</button>
+          <button class="filter-pill" data-cat="colored" onclick="setFilter('colored')">Colored</button>
+          <button class="filter-pill" data-cat="natural" onclick="setFilter('natural')">Natural</button>
+          <button class="filter-pill" data-cat="functional" onclick="setFilter('functional')">Functional</button>
+          <button class="filter-pill" data-cat="redstone" onclick="setFilter('redstone')">Redstone</button>
+          <button class="filter-pill" data-cat="tools" onclick="setFilter('tools')">Tools</button>
+          <button class="filter-pill" data-cat="combat" onclick="setFilter('combat')">Combat</button>
+          <button class="filter-pill" data-cat="armor" onclick="setFilter('armor')">Armor</button>
+          <button class="filter-pill" data-cat="food" onclick="setFilter('food')">Food</button>
+          <button class="filter-pill" data-cat="potions" onclick="setFilter('potions')">Potions</button>
+          <button class="filter-pill" data-cat="ingredients" onclick="setFilter('ingredients')">Ingredients</button>
+          <button class="filter-pill" data-cat="spawn_eggs" onclick="setFilter('spawn_eggs')">Spawn Eggs</button>
+          <button class="filter-pill" data-cat="audio" onclick="setFilter('audio')">Music & Audio</button>
         </div>
       </div>
 
@@ -1483,7 +1522,7 @@ print("Raw URL:", res["raw_url"])</div>
       currentFilter = cat;
       currentPage = 1;
       document.querySelectorAll('.filter-pill').forEach(btn => {{
-        btn.classList.toggle('active', btn.innerText.toLowerCase() === cat.replace('_', ' ') || (cat === 'all' && btn.innerText === 'All'));
+        btn.classList.toggle('active', btn.dataset.cat === cat || (!btn.dataset.cat && btn.innerText.toLowerCase() === cat));
       }});
       render();
     }}
